@@ -16,7 +16,7 @@ const replicate = new Replicate({
 
 // Create the Express app
 const app = express();
-app.use(cors({ origin: "http://18.191.172.161:3000/" })); // Enable CORS for all origins
+app.use(cors());
 app.use(express.json()); // Parse JSON bodies
 app.use(express.static("images")); // Serve static files from the 'images' directory
 
