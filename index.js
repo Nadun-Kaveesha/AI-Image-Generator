@@ -26,7 +26,7 @@ const __dirname = path.dirname(__filename);
 
 // Serve the frontend `index.html` file
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html")); // Make sure `index.html` is in the same directory
+  res.sendFile(path.join(__dirname, "main.html")); // Make sure `index.html` is in the same directory
 });
 
 // Handle the image generation
