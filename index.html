@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Image Generation</title>
+  <style>
+    /* Basic reset for margin and padding */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* Container to hold both the form and image */
+    .container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      gap: 30px;
+    }
+
+    /* Form container (left side) */
+    #imageFormContainer {
+      flex: 1;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; /* Horizontally center content */
+      align-items: center; /* Vertically center content */
+    }
+
+    /* Heading styling */
+    h1 {
+      font-size: 2.5rem;
+      color: #333;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Input and button styling */
+    input[type="text"] {
+      width: 300px;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4caf50;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    /* Styling for the generated image container (right side) */
+    #imageDisplayContainer {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      visibility: hidden; /* Initially hide the image display container */
+    }
+
+    h2 {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      color: #333;
+    }
+
+    #generatedImage {
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 100%;
+      max-height: 500px;
+    }
+
+    /* Download Button Styling */
+    #downloadButton {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #2196f3;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+      visibility: hidden; /* Hide until the image is generated */
+    }
+
+    #downloadButton:hover {
+      background-color: #1976d2;
+    }
+
+    /* Loading Spinner Styling */
+    #loadingSpinner {
+      border: 4px solid #f3f3f3; /* Light grey */
+      border-top: 4px solid #3498db; /* Blue color */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 2s linear infinite;
+      visibility: hidden; /* Hide spinner by default */
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    /* Keyframe for the spinner animation */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @media screen and (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      h2 {
+        font-size: 1rem;
+      }
+
+      input[type="text"], button {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      #generatedImage {
+        max-height: 300px;
+      }
+
+      #imageFormContainer {
+        width: 100%;
+        padding: 15px;
+      }
+
+      #imageDisplayContainer {
+        width: 100%;
+        padding: 15px;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      h2 {
+        font-size: 0.9rem;
+      }
+
+      #generatedImage {
+        max-height: 250px;
+      }
+
+      #imageFormContainer {
+        padding: 10px;
+      }
+
+      #imageDisplayContainer {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left side: Prompt Form -->
+    <div id="imageFormContainer">
+      <h1>Generate AI Image</h1>
+      <form id="imageForm">
+        <label for="prompt">Prompt: </label>
+        <input type="text" id="prompt" name="prompt" required placeholder="Enter your image prompt">
+        <button type="submit">Generate Image</button>
+        <div id="loadingSpinner"></div>
+      </form>
+    </div>
+
+    <!-- Right side: Generated Image (Initially hidden) -->
+    <div id="imageDisplayContainer">
+      <div>
+        <h2>Generated Image:    <button id="downloadButton">Download Image</button></h2>
+        <img id="generatedImage" src="" alt="Generated Image">
+        <!-- Loading Spinner -->
+        
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('imageForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const prompt = document.getElementById('prompt').value;
+
+      // Show the loading spinner while the image is being generated
+      document.getElementById('loadingSpinner').style.visibility = 'visible';
+
+      // Hide image and download button until the image is generated
+      document.getElementById('imageDisplayContainer').style.visibility = 'hidden';
+      document.getElementById('downloadButton').style.visibility = 'hidden';
+
+      // Send the prompt to the backend to generate the image
+      const response = await fetch('http://localhost:3000/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (response.ok) {
+        // Create a Blob URL from the image response
+        const imageBlob = await response.blob();
+        const imageUrl = URL.createObjectURL(imageBlob);
+
+        // Set the Blob URL as the image source
+        document.getElementById('generatedImage').src = imageUrl;
+
+        // Hide the loading spinner and show the image and download button
+        document.getElementById('loadingSpinner').style.visibility = 'hidden';
+        document.getElementById('imageDisplayContainer').style.visibility = 'visible';
+
+        // Enable the Download Image button and set the download link
+        const downloadButton = document.getElementById('downloadButton');
+        downloadButton.style.visibility = 'visible';
+        downloadButton.addEventListener('click', () => {
+          const link = document.createElement('a');
+          link.href = imageUrl;
+          link.download = `${prompt}-Image.png`; // Set the download filename
+          link.click(); // Trigger the download
+        });
+      } else {
+        alert('Failed to generate image');
+        document.getElementById('loadingSpinner').style.visibility = 'hidden';
+      }
+    });
+  </script>
+</body>
+</html>
