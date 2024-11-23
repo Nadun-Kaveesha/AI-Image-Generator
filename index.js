@@ -5,7 +5,7 @@ import cors from "cors";
 import { fileURLToPath } from "url"; // Import fileURLToPath to get the current file path
 import { writeFile } from "node:fs/promises"; // To save output images
 import path from "path"; // For serving the HTML file
-
+import cors from "cors";
 
 // Load environment variables from the .env file
 dotenv.config();
