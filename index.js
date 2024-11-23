@@ -5,7 +5,6 @@ import cors from "cors";
 import { fileURLToPath } from "url"; // Import fileURLToPath to get the current file path
 import { writeFile } from "node:fs/promises"; // To save output images
 import path from "path"; // For serving the HTML file
-import cors from "cors";
 
 // Load environment variables from the .env file
 dotenv.config();
@@ -17,7 +16,7 @@ const replicate = new Replicate({
 
 // Create the Express app
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "http://18.191.172.161:3000/" })); // Enable CORS for all origins
 app.use(express.json()); // Parse JSON bodies
 app.use(express.static("images")); // Serve static files from the 'images' directory
 
