@@ -5,6 +5,7 @@ import cors from "cors";
 import { fileURLToPath } from "url"; // Import fileURLToPath to get the current file path
 import { writeFile } from "node:fs/promises"; // To save output images
 import path from "path"; // For serving the HTML file
+import textDetectionAndTranslation from "./languageDetectionAndTranslation.js";
 
 // Load environment variables from the .env file
 dotenv.config();
@@ -32,8 +33,18 @@ app.get("/", (req, res) => {
 // Handle the image generation
 app.post("/generate-image", async (req, res) => {
   const { prompt } = req.body; // Get the user input from the frontend
+  let translatedText;
+
+  try {
+    translatedText = await textDetectionAndTranslation(prompt); // Await the promise for translated text
+    console.log("Translated text:", translatedText);
+  } catch (error) {
+    console.error("Translation failed:", error);
+    return res.status(500).json({ error: "Failed to translate prompt." });
+  }
+
   const input = {
-    prompt: prompt,
+    prompt: translatedText,
     resolution: "1024x1024",
     output_format: "png",
     num_outputs: 1,
