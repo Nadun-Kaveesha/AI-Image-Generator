@@ -37,7 +37,7 @@ app.post("/generate-image", async (req, res) => {
 
   try {
     translatedText = await textDetectionAndTranslation(prompt); // Await the promise for translated text
-    console.log("Translated text:", translatedText);
+    console.log("\nTranslated text:", translatedText);
   } catch (error) {
     console.error("Translation failed:", error);
     return res.status(500).json({ error: "Failed to translate prompt." });
@@ -52,10 +52,11 @@ app.post("/generate-image", async (req, res) => {
     output_quality: 100,
     num_inference_steps: 4,
     disable_safety_checker: true,
+    go_fast: false,
   };
 
   try {
-    console.log("\nStarting image generation...");
+    console.log("Starting image generation...");
     // Call the Flux Schnell model with the updated input
     const output = await replicate.run(
       "black-forest-labs/flux-schnell", // Model name
@@ -76,4 +77,4 @@ app.post("/generate-image", async (req, res) => {
 });
 
 // Start the server
-app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+app.listen(3001, () => console.log("Server running on http://localhost:3001"));

@@ -239,7 +239,7 @@
       document.getElementById('downloadButton').style.visibility = 'hidden';
 
       // Send the prompt to the backend to generate the image
-      const response = await fetch('http://localhost:3000/generate-image', {
+      const response = await fetch('http://localhost:3001/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
