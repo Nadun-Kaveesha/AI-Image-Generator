@@ -1,6 +1,6 @@
 import dotenv from "dotenv"; // Import dotenv to load .env variables
 import Replicate from "replicate"; // Import Replicate API client
-import { writeFile } from "node:fs/promises"; // To save output images
+import { writeFile, unlink } from "node:fs/promises"; // To save and delete files
 import path from "path"; // For serving the HTML file
 import textDetectionAndTranslation from "./languageDetectionAndTranslation.js";
 import uploadImageToS3 from "./upload-image.js";
@@ -12,8 +12,6 @@ dotenv.config();
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
-
-
 
 async function generateImage(prompt, res, __dirname) {
   let translatedText;
@@ -44,16 +42,30 @@ async function generateImage(prompt, res, __dirname) {
       "black-forest-labs/flux-schnell", // Model name
       { input }
     );
+
     // Save the image locally and send the URL back to the frontend
-    for (const [index, item] of Object.entries(output)) {
-      // Save the PNG image
-      await writeFile(`output_${index}.png`, item, "base64"); // Assumes output is base64 encoded
-      const imagePath = path.join(__dirname, `output_${index}.png`);
+    for (const item of output) {
+      // Generate a unique filename using the current timestamp
+      const timestamp = Date.now();
+      const fileName = `output_${timestamp}.png`;
+      const imagePath = path.join(__dirname, fileName);
+
+      // Save the PNG image locally
+      await writeFile(imagePath, item, "base64"); // Assumes output is base64 encoded
+
+      // Upload the image to S3
       try {
-        const s3Link = await uploadImageToS3(imagePath, `output_${index}.png`);
-        res.status(200).json({ links: s3Link }); 
+        const s3Link = await uploadImageToS3(imagePath, fileName);
+        console.log(`Image uploaded successfully to S3: ${s3Link}`);
+
+        // Delete the local file after successful upload
+        await unlink(imagePath);
+        console.log(`Local file deleted: ${imagePath}`);
+
+        // Respond with the S3 link
+        return res.status(200).json({ link: s3Link });
       } catch (error) {
-        console.error("Error uploading image to S3:");
+        console.error("Error uploading image to S3:", error);
       }
     }
   } catch (error) {
