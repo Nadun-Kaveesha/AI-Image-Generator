@@ -149,56 +149,6 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    @media screen and (max-width: 768px) {
-      h1 {
-        font-size: 1.8rem;
-      }
-
-      h2 {
-        font-size: 1rem;
-      }
-
-      input[type="text"], button {
-        width: 100%;
-        max-width: 100%;
-      }
-
-      #generatedImage {
-        max-height: 300px;
-      }
-
-      #imageFormContainer {
-        width: 100%;
-        padding: 15px;
-      }
-
-      #imageDisplayContainer {
-        width: 100%;
-        padding: 15px;
-      }
-    }
-
-    @media screen and (max-width: 480px) {
-      h1 {
-        font-size: 1.6rem;
-      }
-
-      h2 {
-        font-size: 0.9rem;
-      }
-
-      #generatedImage {
-        max-height: 250px;
-      }
-
-      #imageFormContainer {
-        padding: 10px;
-      }
-
-      #imageDisplayContainer {
-        padding: 10px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -217,10 +167,8 @@
     <!-- Right side: Generated Image (Initially hidden) -->
     <div id="imageDisplayContainer">
       <div>
-        <h2>Generated Image:    <button id="downloadButton">Download Image</button></h2>
+        <h2>Generated Image: <button id="downloadButton">Download Image</button></h2>
         <img id="generatedImage" src="" alt="Generated Image">
-        <!-- Loading Spinner -->
-        
       </div>
     </div>
   </div>
@@ -246,12 +194,14 @@
       });
 
       if (response.ok) {
-        // Create a Blob URL from the image response
-        const imageBlob = await response.blob();
-        const imageUrl = URL.createObjectURL(imageBlob);
+        const data = await response.json();
 
-        // Set the Blob URL as the image source
-        document.getElementById('generatedImage').src = imageUrl;
+        // Get the image URL from the response (assuming it's in 'data.links')
+        const imageUrl = data.links;  // Assuming 'links' is the S3 URL
+
+        // Set the image URL as the source
+        const imgElement = document.getElementById('generatedImage');
+        imgElement.src = imageUrl;
 
         // Hide the loading spinner and show the image and download button
         document.getElementById('loadingSpinner').style.visibility = 'hidden';

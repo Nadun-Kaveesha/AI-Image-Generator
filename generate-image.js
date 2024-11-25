@@ -3,6 +3,7 @@ import Replicate from "replicate"; // Import Replicate API client
 import { writeFile } from "node:fs/promises"; // To save output images
 import path from "path"; // For serving the HTML file
 import textDetectionAndTranslation from "./languageDetectionAndTranslation.js";
+import uploadImageToS3 from "./upload-image.js";
 
 // Load environment variables from the .env file
 dotenv.config();
@@ -48,8 +49,12 @@ async function generateImage(prompt, res, __dirname) {
       // Save the PNG image
       await writeFile(`output_${index}.png`, item, "base64"); // Assumes output is base64 encoded
       const imagePath = path.join(__dirname, `output_${index}.png`);
-      console.log(`Image saved locally at ${imagePath}`);
-      res.sendFile(imagePath);
+      try {
+        const s3Link = await uploadImageToS3(imagePath, `output_${index}.png`);
+        res.status(200).json({ links: s3Link }); 
+      } catch (error) {
+        console.error("Error uploading image to S3:");
+      }
     }
   } catch (error) {
     console.error("Error generating image:", error);

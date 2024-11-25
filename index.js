@@ -2,10 +2,11 @@ import dotenv from "dotenv"; // Import dotenv to load .env variables
 import Replicate from "replicate"; // Import Replicate API client
 import express from "express";
 import { fileURLToPath } from "url"; // Import fileURLToPath to get the current file path
-import { writeFile } from "node:fs/promises"; // To save output images
 import path from "path"; // For serving the HTML file
-import textDetectionAndTranslation from "./languageDetectionAndTranslation.js";
 import generateImage from "./generate-image.js";
+import cors from "cors";
+
+
 
 // Load environment variables from the .env file
 dotenv.config();
@@ -17,6 +18,8 @@ const replicate = new Replicate({
 
 // Create the Express app
 const app = express();
+app.use(cors());
+
 app.use(express.json()); // Parse JSON bodies
 
 // Get the current directory path (equivalent to __dirname in CommonJS)
@@ -31,8 +34,8 @@ app.get("/", (req, res) => {
 // Handle the image generation
 app.post("/generate-image", async (req, res) => {
   const { prompt } = req.body; // Get the user input from the frontend
-  generateImage(prompt, res, __dirname);
+  await generateImage(prompt, res, __dirname);
 });
 
 // Start the server
-app.listen(3001, () => console.log("Server running on http://localhost:3001"));
+app.listen(3001, "0.0.0.0", () => console.log("Server running on http://localhost:3001"));
