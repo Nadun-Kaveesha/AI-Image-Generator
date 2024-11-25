@@ -63,7 +63,7 @@ async function generateImage(prompt, res, __dirname) {
         console.log(`Local file deleted: ${imagePath}`);
 
         // Respond with the S3 link
-        return res.status(200).json({ link: s3Link });
+        return res.status(200).json({ links: s3Link });
       } catch (error) {
         console.error("Error uploading image to S3:", error);
       }
