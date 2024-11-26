@@ -38,4 +38,4 @@ app.post("/generate-image", async (req, res) => {
 });
 
 // Start the server
-app.listen(3001, "0.0.0.0", () => console.log("Server running on http://3.146.199.244:3001"));
+app.listen(3001, "0.0.0.0", () => console.log("Server running on http://34.236.1.159:3001"));
