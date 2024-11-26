@@ -28,7 +28,7 @@ async function uploadImageToS3 (filePath, uniqueIdentifier) {
   } catch (error) {
     console.error("Error uploading image to S3:", error);
   }
-  const s3Link =  `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${uniqueIdentifier}`;
+  const s3Link =  `https://${process.env.AWS_BUCKET_NAME}.s3.us-east-1.amazonaws.com/${uniqueIdentifier}`;
   return s3Link;
 };
 
